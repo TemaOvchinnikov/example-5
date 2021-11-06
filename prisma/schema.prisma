@@ -17,8 +17,73 @@ model User {
   role      Role      @default(USER)
   createdAt DateTime  @default(now())
   updatedAt DateTime?
+  posts_    Like[]
+  posts     Post[]
+  images    Image[]
+  comments  Comment[]
+  share     Share[]
 
   @@map("users")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String    @db.VarChar(255)
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  likes     Like[]
+  images    Image[]
+  comments  Comment[]
+  share     Share[]
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@map("posts")
+}
+
+model Like {
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+  post       Post      @relation(fields: [postId], references: [id])
+  postId     Int
+  assignedAt DateTime  @default(now())
+  assignedBy DateTime?
+
+  @@id([userId, postId])
+  @@map("likes")
+}
+
+model Image {
+  id        Int    @id @default(autoincrement())
+  imagePuth String @db.VarChar(255)
+  user      User   @relation(fields: [userId], references: [id])
+  userId    Int
+  post      Post   @relation(fields: [postId], references: [id])
+  postId    Int
+
+  @@map("images")
+}
+
+model Comment {
+  id      Int    @id @default(autoincrement())
+  comment String @db.Text
+  user    User   @relation(fields: [userId], references: [id])
+  userId  Int
+  post    Post   @relation(fields: [postId], references: [id])
+  postId  Int
+
+  @@map("comments")
+}
+
+model Share {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int
+
+  @@map("shares")
 }
 
 enum Role {
