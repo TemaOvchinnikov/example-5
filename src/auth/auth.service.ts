@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -35,7 +35,7 @@ export class AuthService {
     });
 
     if (user && user.email === createRegisterDto.email) {
-      throw new ConflictException('Choose another email');
+      throw new BadRequestException('Choose another email');
     }
 
     createRegisterDto.password = await bcrypt.hash(

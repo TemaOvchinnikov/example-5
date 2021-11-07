@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
+import { CreateRegisterDto } from './auth/dto/create-register.dto';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/guards/local-auth.guard';
+import { ReqBody } from './users/decorators/req-body.decorator';
+import { ReqUser } from './users/decorators/req-user.decorator';
 
 @Controller()
 export class AppController {
@@ -9,21 +18,22 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Request() req) {
-    //return this.authService.login();
-    //return req.user;
-    return this.authService.login(req.user);
+  async login(@ReqUser() user) {
+    return this.authService.login(user);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('/register')
-  async register(@Request() req) {
-    return this.authService.register(req.body);
+  async register(
+    @ReqBody(new ValidationPipe({ validateCustomDecorators: true }))
+    createRegisterDto: CreateRegisterDto,
+  ) {
+    return this.authService.register(createRegisterDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@ReqUser() user) {
+    return user;
   }
 }
